@@ -14,14 +14,36 @@ st.set_page_config(
 )
 
 # ─── LOGIN ───────────────────────────────────────────────────────────────────
+# Tinggal tambah/hapus baris di sini untuk menambahkan akun pegawai baru.
+# Setiap pegawai bisa punya username & password sendiri, tapi "seksi" harus
+# disamakan dengan seksi tempat dia bertugas (supaya hak akses datanya sama).
 USERS = {
-    "admin": {"password": "atrbpn2025", "role": "keuangan"},
-    "s1":    {"password": "s12025",     "role": "seksi", "seksi": "S1"},
-    "s2":    {"password": "s22025",     "role": "seksi", "seksi": "S2"},
-    "s3":    {"password": "s32025",     "role": "seksi", "seksi": "S3"},
-    "s4":    {"password": "s42025",     "role": "seksi", "seksi": "S4"},
-    "s5":    {"password": "s52025",     "role": "seksi", "seksi": "S5"},
-    "s6":    {"password": "s62025",     "role": "seksi", "seksi": "S6"},
+    # ── Admin Keuangan (akses semua seksi) ──────────────────────────────────
+    "admin":     {"password": "atrbpn2025", "role": "keuangan", "nama": "Admin Keuangan"},
+
+    # ── Seksi 1 — Survei & Pemetaan ──────────────────────────────────────────
+    "andi.s1":   {"password": "andi2025",   "role": "seksi", "seksi": "S1", "nama": "Andi Wijaya"},
+    "siti.s1":   {"password": "siti2025",   "role": "seksi", "seksi": "S1", "nama": "Siti Rahma"},
+
+    # ── Seksi 2 — Penetapan Hak & Pendaftaran ───────────────────────────────
+    "budi.s2":   {"password": "budi2025",   "role": "seksi", "seksi": "S2", "nama": "Budi Santoso"},
+    "rina.s2":   {"password": "rina2025",   "role": "seksi", "seksi": "S2", "nama": "Rina Putri"},
+
+    # ── Seksi 3 — Penataan & Pemberdayaan ───────────────────────────────────
+    "doni.s3":   {"password": "doni2025",   "role": "seksi", "seksi": "S3", "nama": "Doni Saputra"},
+    "wati.s3":   {"password": "wati2025",   "role": "seksi", "seksi": "S3", "nama": "Wati Susanti"},
+
+    # ── Seksi 4 — Pengadaan Tanah & Pengembangan ────────────────────────────
+    "eko.s4":    {"password": "eko2025",    "role": "seksi", "seksi": "S4", "nama": "Eko Prasetyo"},
+    "lina.s4":   {"password": "lina2025",   "role": "seksi", "seksi": "S4", "nama": "Lina Marlina"},
+
+    # ── Seksi 5 — Pengendalian & Sengketa ───────────────────────────────────
+    "fajar.s5":  {"password": "fajar2025",  "role": "seksi", "seksi": "S5", "nama": "Fajar Hidayat"},
+    "dewi.s5":   {"password": "dewi2025",   "role": "seksi", "seksi": "S5", "nama": "Dewi Lestari"},
+
+    # ── Seksi 6 — Sub Bag Tata Usaha ─────────────────────────────────────────
+    "gilang.s6": {"password": "gilang2025", "role": "seksi", "seksi": "S6", "nama": "Gilang Ramadhan"},
+    "yuni.s6":   {"password": "yuni2025",   "role": "seksi", "seksi": "S6", "nama": "Yuni Astuti"},
 }
 
 def show_login():
@@ -57,10 +79,11 @@ def show_login():
                 st.session_state['username'] = username
                 st.session_state['role'] = user_info["role"]
                 st.session_state['seksi_akses'] = user_info.get("seksi", None)
+                st.session_state['nama_user'] = user_info.get("nama", username)
                 st.rerun()
             else:
                 st.error("❌ Username atau password salah. Silakan coba lagi.")
-                st.info("⚠️ Akses hanya untuk Admin Keuangan dan Admin Seksi yang terdaftar.")
+                st.info("⚠️ Akses hanya untuk Admin Keuangan dan pegawai Seksi yang terdaftar.")
 
         st.markdown("""
         <div style='text-align:center;font-size:11px;color:#b2bec3;margin-top:20px'>
@@ -74,6 +97,8 @@ if 'role' not in st.session_state:
     st.session_state['role'] = None
 if 'seksi_akses' not in st.session_state:
     st.session_state['seksi_akses'] = None
+if 'nama_user' not in st.session_state:
+    st.session_state['nama_user'] = None
 
 if not st.session_state['logged_in']:
     show_login()
@@ -81,6 +106,7 @@ if not st.session_state['logged_in']:
 
 ROLE = st.session_state['role']
 SEKSI_AKSES = st.session_state['seksi_akses']
+NAMA_USER = st.session_state.get('nama_user') or st.session_state.get('username','')
 
 # ─── KONSTANTA ───────────────────────────────────────────────────────────────
 BULAN = ['Februari','Maret','April','Mei','Juni','Juli',
@@ -383,7 +409,7 @@ with st.sidebar:
 
     st.markdown(f"""
     <div style='font-size:11px;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:6px'>
-    👤 Login sebagai: <strong style='color:#c8a84b'>{st.session_state.get('username','')}</strong>
+    👤 Login sebagai: <strong style='color:#c8a84b'>{NAMA_USER}</strong>
     </div>
     """, unsafe_allow_html=True)
 
@@ -406,7 +432,7 @@ with st.sidebar:
 
     st.markdown("---")
     if st.button("🚪 Logout", use_container_width=True):
-        for key in ['logged_in','username','role','seksi_akses']:
+        for key in ['logged_in','username','role','seksi_akses','nama_user']:
             st.session_state[key] = False if key == 'logged_in' else None
         st.rerun()
     st.markdown("<div style='font-size:11px;opacity:0.5;text-align:center;margin-top:8px'>© 2026 ATR/BPN Surabaya I</div>", unsafe_allow_html=True)
@@ -425,7 +451,7 @@ if halaman == "🏠 Dashboard":
         st.markdown(f"""
         <div style='background:#fff3cd;border-radius:10px;padding:12px 18px;margin-bottom:16px;
                     border-left:4px solid #c8a84b;font-size:13px'>
-        🔒 Anda login sebagai <b>Admin {SEKSI_AKSES} — {SEKSI_NAMA[SEKSI_AKSES]}</b>.
+        🔒 Anda login sebagai <b>{NAMA_USER} — {SEKSI_AKSES} ({SEKSI_NAMA[SEKSI_AKSES]})</b>.
         Dashboard hanya menampilkan data seksi Anda.
         </div>
         """, unsafe_allow_html=True)
@@ -475,9 +501,8 @@ if halaman == "🏠 Dashboard":
         st.markdown('<div class="chart-title">🎯 Capaian Realisasi</div>', unsafe_allow_html=True)
         pct_gauge = summary['pct_realisasi'] if ROLE == 'keuangan' else summary['per_seksi'][SEKSI_AKSES]['realisasi_pct']
         fig_gauge = go.Figure(go.Indicator(
-            mode="gauge+number+delta",
+            mode="gauge+number",
             value=pct_gauge,
-            delta={'reference':85,'valueformat':'.1f'},
             number={'suffix':'%','font':{'size':40,'color':'#1a3a6b'}},
             gauge={
                 'axis':{'range':[0,100],'tickcolor':'#636e72'},
